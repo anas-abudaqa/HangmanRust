@@ -21,31 +21,15 @@ fn main() {
 
 }
 
-fn create_game_word() {
+struct Game{
+    game_difficulty: String
+    game_word: String,
 
 
 
-//did this save?
 
+};
 
-
-    
-/*
-
-const WORD_LENGTH: usize = 6;
-    println!("Word length is {}", WORD_LENGTH);
-    let mut game_word_array: [String; WORD_LENGTH] = ["_".to_string(); WORD_LENGTH];
-
-    for letter in 1..WORD_LENGTH{
-        println!("Letter {} is {}", letter, game_word_array[letter]);
-    }
-
-
-*/    
-    
-    
-   
-}
 
 fn read_user_input() -> String{
     let mut buffer = String::new();
