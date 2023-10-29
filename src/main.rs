@@ -46,6 +46,8 @@ impl Game{
         
     }
     
+    //penis is this here??
+
 
     fn create_game_word_vector(&mut self, chosen_word: &String){
         //iterate over letters in chosen word and append them into our vec of chars
