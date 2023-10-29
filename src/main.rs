@@ -63,6 +63,7 @@ impl Game{
         output[0]
     }
 
+
     fn create_game_word_vector(&mut self, chosen_word: &String){
         //iterate over letters in chosen word and append them into our vec of chars
         for letter in chosen_word.chars(){
