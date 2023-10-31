@@ -14,14 +14,19 @@ fn main() {
         
         drawn_word_vec: Vec::new(),
 
-        used_letters: Vec::new()
+        used_letters_vec: Vec::new(),
+
+        game_state: Gamestate::Turn
     };
 
     hangman.create_game_word_vector(&game_word);
 
     println!("Guess a letter!");
-    for number in (1..tries).rev() {
 
+
+
+
+    /*for number in (1..tries).rev() {
 
         let guess = Game::read_user_input();
 
@@ -32,8 +37,51 @@ fn main() {
         hangman.draw(&indexes, guess);
         
         println!("Tries left {}", number);
-    }
+    }*/
 
+}
+
+
+/* 
+Game starts
+
+//////////////
+Setting up game:
+
+Read user input for difficulty settings
+Choose game word from external file
+
+//////////////
+/// 
+
+
+loop starts:
+
+turn starts
+
+Start with reading user input for guess
+Check if input char has already been used
+if yes, restart turn
+
+if not, check for matches in game word
+if matches, update drawing
+if not, tries left -1
+
+turn ends
+
+if drawn vector has all chars, game is win ==================================>Win state
+if # of tries done, and drawn vector is not yet full, game is lose ==========>Game over state
+
+if neither, restart loop
+
+
+*/
+
+
+enum Gamestate {
+    Setup(u8), 
+    Turn(u8), 
+    GameEnd(u8, bool),
 }
 
 struct Game{
@@ -45,12 +93,17 @@ struct Game{
     drawn_word_vec: Vec<char>,
 
     //used_letters is a char vector to store all chars inputted by the user
-    used_letters: Vec<char>
+    used_letters_vec: Vec<char>,
     
+    game_state: Gamestate
 
 }
 
 impl Game{
+    
+    fn update_gamestate(&self, )
+
+
 
     fn read_user_input() -> char{
         //create a buffer string variable to store result of read_line in
@@ -92,6 +145,13 @@ impl Game{
 
         index_vec
     }
+
+
+    fn verify_matching_letters(&self, input_character: &char) {
+        //if input_character
+        
+    }
+
 
     //Note: This function will take ownership of input_character. I was too lazy to implement it elsewise
     fn draw(&mut self, indexes: &Vec<usize>, input_character: char){
