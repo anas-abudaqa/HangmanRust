@@ -56,20 +56,29 @@ fn main() {
     
 
     
-
+    let mut guess = '-'; 
+    let mut matching_indices: Vec<usize> = Vec::new();
 
     loop {
-        let mut guess = '-'; 
-        let mut matching_indices: Vec<usize> = Vec::new();
+
 
         match hangman.game_state {
             Gamestate::Setup => hangman.setup_game(),
             Gamestate::AwaitingUser => {
                 guess = hangman.read_user_input();
+                
             },
-            Gamestate::FindingMatches => matching_indices = hangman.find_matching_indices(&guess),
-            Gamestate::UpdateScreen =>  println!("o"), //hangman.draw(&matching_indices, guess),
-            Gamestate::GameEnd(win) => println!("o"),
+            //not working anymore idek
+            Gamestate::FindingMatches => {
+                matching_indices = hangman.find_matching_indices(&guess);
+                
+            },
+            Gamestate::UpdateScreen =>  {
+                hangman.draw(&matching_indices, guess);
+                hangman.check_endgame_conditions();
+            }
+            Gamestate::GameEnd(true) => hangman.game_is_won(),
+            Gamestate::GameEnd(false) => hangman.game_is_lost()
         }
 
         
@@ -113,9 +122,9 @@ struct Game{
 impl Game{
     
 
-    fn update_gamestate(&mut self, turn_number: u8 ){
+    fn update_gamestate(&mut self, state_number: u8 ){
 
-        match turn_number {
+        match state_number {
             0 => self.game_state = Gamestate::Setup,
             1 => self.game_state = Gamestate::AwaitingUser, 
             2 => self.game_state = Gamestate::FindingMatches,
@@ -184,13 +193,15 @@ impl Game{
             .expect("Something wrong happened");
         //collect the output in a vec of chars and return first char in it
         let output: Vec<char> = buffer.chars().collect();
+        let result = self.verify_input(&output[0]);
         
-
-        if !self.verify_input(&output[0]){
+        if !result {
             println!("Sorry, you already used {}", output[0]);
-            '*'
+            self.update_gamestate(3); //Go to state: UpdateScreen
+            //'*'
         } else {
             self.used_letters_vec.push(output[0]);
+            self.turns_left -= 1; 
             self.update_gamestate(2); //Go to state: FindingMatches
             output[0]
         }
@@ -216,7 +227,7 @@ impl Game{
         else{
             println!("Nice guess!");
         }
-        self.update_gamestate(1); //Go back to state: AwaitingUser
+        self.update_gamestate(3); //Go to state: UpdateScreen
         // return vector of the indices of the game word where a match was found
         index_vec
     }
@@ -225,7 +236,7 @@ impl Game{
     
 
 
-    //Note: This function will take ownership of input_character. I was too lazy to implement it elsewise
+    ///// UpdateScreen functions
     fn draw(&mut self, indices: &Vec<usize>, input_character: char){
         //first check if the array is not empty
         if !indices.is_empty() {
@@ -237,8 +248,56 @@ impl Game{
         println!("{:?}", self.drawn_word_vec); 
 
     }
+    
+
+    fn check_endgame_conditions(&mut self){
+        let mut game_won = false;
+        let mut game_lost = false;
+
+        for &letter in self.drawn_word_vec.iter(){
+            if letter == '_' {
+                //if there are _ in drawn_word_vec, then we still have letters to guess
+                game_won = false;
+                break; //no point in searching more, so break out of loop
+            
+            } 
+            else {game_won = true};//if there is a letter there, set game_won true
+        }
+
+        if self.turns_left == 0 {game_lost = true}; //if we run out of turns, set game_lost true
+
+        if game_won {self.update_gamestate(4)} //if game_won is true, go to state: EndGame(Win)
+        else if game_lost {self.update_gamestate(5)}//if game_won is false and if game_lost is true, go to state: EndGame(Lost)
+        else { self.update_gamestate(1); } //if neither conditions satisfied, go back to state: AwaitingUser
+
+    }
+
+    fn game_is_won(&mut self){
+        let mut buffer = String::new();
+        println!("CONGRATULATIONS, YOU HAVE WON");
+        println!("Play again? (y, n)");
+        io::stdin()
+            .read_line(&mut buffer)
+            .expect("Something wrong happened");
+
+        if buffer == "y" {self.update_gamestate(0)}
+        else {};
+
+    }
 
 
+    fn game_is_lost(&mut self){
+        let mut buffer = String::new();
+        println!("You Lost. You ran out of tries :(");
+        println!("Play again? (y, n)");
+        io::stdin()
+            .read_line(&mut buffer)
+            .expect("Something wrong happened");
+
+        if buffer == "y" {self.update_gamestate(0)}
+        else {};
+
+    }
 
 }
 
