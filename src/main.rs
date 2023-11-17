@@ -198,7 +198,7 @@ impl Game{
         if !result {
             println!("Sorry, you already used {}", output[0]);
             self.update_gamestate(3); //Go to state: UpdateScreen
-            //'*'
+            //'*' ////////why do i need this return??
         } else {
             self.used_letters_vec.push(output[0]);
             self.turns_left -= 1; 
